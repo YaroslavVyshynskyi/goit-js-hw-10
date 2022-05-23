@@ -20,9 +20,11 @@ function onInput(event) {
     fetchCountries(name)
         // .then(renderCountryCard)
         .then(countries => {
-            console.log("to e :", countries)
+            // console.log("to e :", countries)
+            const countryName = countries.getAttribute(name);
+            console.log("to e :", countryName)
             countries.forEach(element => {
-                renderCountriesList(element.name);
+                renderCountriesList(element);
             });
         })
         .catch(onFetchError)
