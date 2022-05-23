@@ -2,33 +2,29 @@ import './css/styles.css';
 import countryCard from "./country-card.hbs";
 import countriesList from "./countries-list.hbs";
 import Notiflix from 'notiflix';
+import debounce from 'lodash.debounce';
 // import FetchCountris from "./fetchCountries";
 
 const DEBOUNCE_DELAY = 300;
-const debounce = require('lodash.debounce');
 const input = document.querySelector("#search-box");
 const countryList = document.querySelector(".country-list");
 const countryCardInfo = document.querySelector(".country-info");
 
-input.addEventListener("input", onInput);
-// debounce(onInput, DEBOUNCE_DELAY))
+input.addEventListener("input", debounce(onInput, DEBOUNCE_DELAY));
 
-function onInput(event) { 
-    const name = event.currentTarget.value.trim();
-    console.log(name);
+function onInput(event) {
+    const name = event.target.value.trim();
+
+    if (!name) { 
+        countryList.innerHTML = "";
+        return null;
+    };
     
     fetchCountries(name)
         // .then(renderCountryCard)
-        .then(countries => {
-            // console.log("to e :", countries)
-            const countryName = countries.getAttribute(name);
-            console.log("to e :", countryName)
-            countries.forEach(element => {
-                renderCountriesList(element);
-            });
-        })
+        .then(renderCountries)
         .catch(onFetchError)
-        // .finally(() => input.requestFullscreen());
+        // .finally(() => input.reset());
 }
 
 function fetchCountries(name) {
@@ -36,15 +32,30 @@ function fetchCountries(name) {
         .then(response => response.json())
 }
 
-function renderCountriesList(country) { 
-    const markup = countriesList(country);
-    countryList.innerHTML = markup;
+function renderCountries(countries) {
+    console.log(countries);
+
+    if (countries.length === 1) {
+        const markup = countries.map((country) => {
+            const languages = Object.values(country.languages).join(", ");
+            country.languages = languages;
+            return countryCard(country)
+        }).join("");
+        countryCardInfo.innerHTML = markup;
+        countryList.innerHTML = "";
+    } else {
+        const markup = countries.map((country) => {
+            return countriesList(country)
+        }).join("");
+        countryList.innerHTML = markup;
+        countryCardInfo.innerHTML = "";
+    }
 }
 
-function renderCountryCard(country) {
-    const markup = countryCard(country);
-    countryCardInfo.innerHTML = markup;
-}
+// function renderCountryCard(country) {
+//     const markup = countryCard(country);
+//     countryCardInfo.innerHTML = markup;
+// }
 
 function onFetchError(error) {
     console.log(error);
