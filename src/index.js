@@ -15,7 +15,9 @@ input.addEventListener("input", debounce(onInput, DEBOUNCE_DELAY));
 function onInput(event) {
     const name = event.target.value.trim();
 
-    if (!name) { 
+    if (!name) {
+        countryList.innerHTML = "";
+        countryCardWrap.innerHTML = "";
         throw new Error('Error fetching data');
     };
     
